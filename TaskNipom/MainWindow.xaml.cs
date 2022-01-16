@@ -21,15 +21,13 @@ namespace TaskNipom
     /// </summary>
     public partial class MainWindow : Window
     {
-        public DataSet ds = new DataSet("Electrocomponents");
-        public List<Electrocomponents> electrocomponents = new List<Electrocomponents>();
+        public List<ElectroComponents> electrocomponents = new List<ElectroComponents>();
         public MainWindow()
         {
             InitializeComponent();
         }
-
         [Serializable]
-        public class Electrocomponents
+        public class ElectroComponents
         {
             public string nаimenovаnie { get; set; }
             public string proizvoditel { get; set; }
@@ -39,7 +37,7 @@ namespace TaskNipom
             public double summa { get; set; }
 
         }
-        private void OpenExcel(object sender, RoutedEventArgs e)
+        private void openExcel_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.DefaultExt = "*.xls;*.xlsx";
@@ -61,6 +59,7 @@ namespace TaskNipom
 
                     int rowCnt = 1;
 
+                    DataSet ds = new DataSet("Electrocomponents");
                     DataTable dt = new DataTable("Component");
 
                     //Чтение шапки
@@ -131,11 +130,6 @@ namespace TaskNipom
                 DataTable tb = ds.Tables[0];
 
                 //костыль для файла "Исходные данные.xlsx"
-                tb.Columns[0].ColumnName = "Наименование";
-                tb.Columns[1].ColumnName = "Производитель";
-                tb.Columns[2].ColumnName = "Категория монтажа";
-                tb.Columns[3].ColumnName = "Стоимость";
-                tb.Columns[4].ColumnName = "Кол-во";
                 tb.Rows.RemoveAt(0);
   
                 this.DataTable_to_Class(tb);
@@ -153,11 +147,12 @@ namespace TaskNipom
             {
                 try
                 {
-                    XmlSerializer xml = new XmlSerializer(typeof(List<Electrocomponents>));
+                    Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                    XmlSerializer xml = new XmlSerializer(typeof(List<ElectroComponents>), new XmlRootAttribute("ElectroComponents"));
 
                     using (FileStream fs = new FileStream(openFileDialog.FileName, FileMode.OpenOrCreate))
                     {
-                        electrocomponents = (List<Electrocomponents>)xml.Deserialize(fs);
+                        electrocomponents = (List<ElectroComponents>)xml.Deserialize(fs);
                     }
                 }
                 catch(XmlException ex)
@@ -177,7 +172,7 @@ namespace TaskNipom
             {
                 try
                 {
-                    XmlSerializer xml = new XmlSerializer(typeof(List<Electrocomponents>));
+                    XmlSerializer xml = new XmlSerializer(typeof(List<ElectroComponents>), new XmlRootAttribute("ElectroComponents"));
 
                     using(FileStream fs = new FileStream(saveFileDialog.FileName, FileMode.OpenOrCreate))
                     {
@@ -195,7 +190,7 @@ namespace TaskNipom
             foreach (DataRow row in dataTable.Rows)
             {
                 electrocomponents.Add(
-                        new Electrocomponents()
+                        new ElectroComponents()
                         {
                             nаimenovаnie = row.ItemArray[0].ToString(),
                             proizvoditel = row.ItemArray[1].ToString(),
@@ -205,6 +200,11 @@ namespace TaskNipom
                             summa = Convert.ToDouble(row.ItemArray[3]) * Convert.ToDouble(row.ItemArray[4])
                         });
             }
+        }
+        private void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            ElectroComponents el = e.Row.Item as ElectroComponents;
+            MessageBox.Show($"{el.kol_vo}");
         }
     }
 }
