@@ -25,15 +25,14 @@ namespace TaskNipom
         {
             InitializeComponent();
         }
-
         public class Electrocomponents
         {
             public string nаimenovаnie { get; set; }
             public string proizvoditel { get; set; }
             public string kаtegoriya__montаjа { get; set; }
-            public string stoimost { get; set; }
-            public string kol_vo { get; set; }
-            public string summa { get; set; }
+            public double stoimost { get; set; }
+            public double kol_vo { get; set; }
+            public double summa { get; set; }
 
         }
         private void OpenExcel(object sender, RoutedEventArgs e)
@@ -99,7 +98,6 @@ namespace TaskNipom
                 }
             }
         }
-
         private void openExcelBtn_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -128,21 +126,29 @@ namespace TaskNipom
 
                 DataTable tb = ds.Tables[0];
 
-                //костыль
+                //костыль для файла "Исходные данные.xlsx"
                 tb.Columns[0].ColumnName = "Наименование";
                 tb.Columns[1].ColumnName = "Производитель";
                 tb.Columns[2].ColumnName = "Категория монтажа";
                 tb.Columns[3].ColumnName = "Стоимость";
                 tb.Columns[4].ColumnName = "Кол-во";
                 tb.Rows.RemoveAt(0);
-                
+
+                foreach (DataRow row in tb.Rows)
+                {
+                    Electrocomponents electrocomponents = new Electrocomponents();
+                    electrocomponents.nаimenovаnie = row.ItemArray[0].ToString();
+                    electrocomponents.proizvoditel = row.ItemArray[1].ToString();
+                    electrocomponents.kаtegoriya__montаjа = row.ItemArray[2].ToString();
+                    electrocomponents.stoimost = (double)row.ItemArray[3];
+                    electrocomponents.kol_vo = (double)row.ItemArray[4];
+                    electrocomponents.summa = electrocomponents.stoimost * electrocomponents.kol_vo;
+                    DataGrid.Items.Add(electrocomponents);
+                }
 
                 dbConnection.Close();
-
-                DataGrid.ItemsSource = tb.DefaultView;
             }
-
-                
+    
         }
         private void opentXmlBtn_Click(object sender, RoutedEventArgs e)
         {
