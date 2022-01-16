@@ -22,14 +22,15 @@
                   AutoGenerateColumns="False"
                   GridLinesVisibility="All"
                   ColumnWidth="*"
-                  Grid.Row="1">
+                  Grid.Row="1"
+                  CellEditEnding="DataGrid_CellEditEnding">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding nаimenovаnie}" Width="*"/>
                 <DataGridTextColumn Header="Производитель" Binding="{Binding proizvoditel}"/>
                 <DataGridTextColumn Header="Категория монтажа" Binding="{Binding kаtegoriya__montаjа}"/>
                 <DataGridTextColumn Header="Стоимость" Binding="{Binding stoimost}"/>
-                <DataGridTextColumn Header="Количество" Binding="{Binding kol_vo, UpdateSourceTrigger=PropertyChanged}"/>
-                <DataGridTextColumn Header="Сумма" Binding="{Binding summa}"/>
+                <DataGridTextColumn Header="Количество" Binding="{Binding kol_vo,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="Сумма" Binding="{Binding Summa}"/>
             </DataGrid.Columns>
         </DataGrid>
         <Button Grid.Row="0" x:Name="Button1" Content="Открыть Excel " HorizontalAlignment="Left" Width="150" Height="30" Margin="10, 0, 0, 0" Click="openExcelBtn_Click"/>

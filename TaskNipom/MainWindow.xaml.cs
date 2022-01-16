@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
-using System.Threading.Tasks;
+using System.ComponentModel;
 using System.Windows;
+using System.Runtime.CompilerServices;
 using System.Reflection;
 using Microsoft.Win32;
 using System.Windows.Controls;
@@ -21,21 +21,32 @@ namespace TaskNipom
     /// </summary>
     public partial class MainWindow : Window
     {
-        public List<ElectroComponents> electrocomponents = new List<ElectroComponents>();
+        private List<Component> electrocomponents = new List<Component>();
         public MainWindow()
         {
             InitializeComponent();
         }
+
         [Serializable]
-        public class ElectroComponents
+        public class Component : INotifyPropertyChanged
         {
+            public event PropertyChangedEventHandler PropertyChanged;
             public string nаimenovаnie { get; set; }
             public string proizvoditel { get; set; }
             public string kаtegoriya__montаjа { get; set; }
             public double stoimost { get; set; }
             public double kol_vo { get; set; }
-            public double summa { get; set; }
-
+            public double Summa { 
+                get { return kol_vo * stoimost; }
+                set { }
+            }
+            private void OnPropertyChanged([CallerMemberName] string propertyName = "")
+            {
+                if (PropertyChanged != null) 
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                }
+            }
         }
         private void openExcel_Click(object sender, RoutedEventArgs e)
         {
@@ -148,11 +159,11 @@ namespace TaskNipom
                 try
                 {
                     Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-                    XmlSerializer xml = new XmlSerializer(typeof(List<ElectroComponents>), new XmlRootAttribute("ElectroComponents"));
+                    XmlSerializer xml = new XmlSerializer(typeof(List<Component>), new XmlRootAttribute("ElectroComponents"));
 
                     using (FileStream fs = new FileStream(openFileDialog.FileName, FileMode.OpenOrCreate))
                     {
-                        electrocomponents = (List<ElectroComponents>)xml.Deserialize(fs);
+                        electrocomponents = (List<Component>)xml.Deserialize(fs);
                     }
                 }
                 catch(XmlException ex)
@@ -172,7 +183,7 @@ namespace TaskNipom
             {
                 try
                 {
-                    XmlSerializer xml = new XmlSerializer(typeof(List<ElectroComponents>), new XmlRootAttribute("ElectroComponents"));
+                    XmlSerializer xml = new XmlSerializer(typeof(List<Component>), new XmlRootAttribute("ElectroComponents"));
 
                     using(FileStream fs = new FileStream(saveFileDialog.FileName, FileMode.OpenOrCreate))
                     {
@@ -190,21 +201,29 @@ namespace TaskNipom
             foreach (DataRow row in dataTable.Rows)
             {
                 electrocomponents.Add(
-                        new ElectroComponents()
+                        new Component()
                         {
                             nаimenovаnie = row.ItemArray[0].ToString(),
                             proizvoditel = row.ItemArray[1].ToString(),
                             kаtegoriya__montаjа = row.ItemArray[2].ToString(),
                             stoimost = Convert.ToDouble(row.ItemArray[3]),
                             kol_vo = Convert.ToDouble(row.ItemArray[4]),
-                            summa = Convert.ToDouble(row.ItemArray[3]) * Convert.ToDouble(row.ItemArray[4])
+                            //Summa = Convert.ToDouble(row.ItemArray[3]) * Convert.ToDouble(row.ItemArray[4])
                         });
             }
         }
         private void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            ElectroComponents el = e.Row.Item as ElectroComponents;
-            MessageBox.Show($"{el.kol_vo}");
+            Component el = e.Row.Item as Component;
+            if (el != null)
+            {
+                el.Summa = el.kol_vo * el.stoimost;
+            }
+
+            DataGrid.ItemsSource = null;
+            DataGrid.ItemsSource = electrocomponents;
+
+            MessageBox.Show($"Новая сумма {el.Summa}");
         }
     }
 }
