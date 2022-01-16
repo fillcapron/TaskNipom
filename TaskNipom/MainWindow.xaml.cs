@@ -20,7 +20,8 @@ namespace TaskNipom
     /// </summary>
     public partial class MainWindow : Window
     {
-        DataSet ds = new DataSet("Electrocomponents");
+        public DataSet ds = new DataSet("Electrocomponents");
+        public List<Electrocomponents> electrocomponents = new List<Electrocomponents>();
         public MainWindow()
         {
             InitializeComponent();
@@ -133,22 +134,11 @@ namespace TaskNipom
                 tb.Columns[3].ColumnName = "Стоимость";
                 tb.Columns[4].ColumnName = "Кол-во";
                 tb.Rows.RemoveAt(0);
-
-                foreach (DataRow row in tb.Rows)
-                {
-                    Electrocomponents electrocomponents = new Electrocomponents();
-                    electrocomponents.nаimenovаnie = row.ItemArray[0].ToString();
-                    electrocomponents.proizvoditel = row.ItemArray[1].ToString();
-                    electrocomponents.kаtegoriya__montаjа = row.ItemArray[2].ToString();
-                    electrocomponents.stoimost = (double)row.ItemArray[3];
-                    electrocomponents.kol_vo = (double)row.ItemArray[4];
-                    electrocomponents.summa = electrocomponents.stoimost * electrocomponents.kol_vo;
-                    DataGrid.Items.Add(electrocomponents);
-                }
-
+  
+                this.DataTable_to_Class(tb);
+                DataGrid.ItemsSource = electrocomponents;
                 dbConnection.Close();
             }
-    
         }
         private void opentXmlBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -163,13 +153,14 @@ namespace TaskNipom
                     Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                     XmlReader xmlFile = XmlReader.Create(openFileDialog.FileName, new XmlReaderSettings());
                     ds.ReadXml(xmlFile);
+                    DataTable dataTable = ds.Tables[0];
+                    this.DataTable_to_Class(dataTable);
                 }
                 catch(XmlException ex)
                 {
                     MessageBox.Show("Ошибка чтения XML файла \n" + ex.Message);
                 }
-                
-                DataGrid.ItemsSource = ds.Tables[0].DefaultView;
+                DataGrid.ItemsSource = electrocomponents;
             }
         }
         private void saveXmlBtn_Click(object sender, RoutedEventArgs e)
@@ -194,6 +185,22 @@ namespace TaskNipom
                 {
                     MessageBox.Show("Ошибка записи XML файла \n" + ex.Message);
                 }
+            }
+        }
+        private void DataTable_to_Class(DataTable dataTable)
+        {
+            foreach (DataRow row in dataTable.Rows)
+            {
+                electrocomponents.Add(
+                        new Electrocomponents()
+                        {
+                            nаimenovаnie = row.ItemArray[0].ToString(),
+                            proizvoditel = row.ItemArray[1].ToString(),
+                            kаtegoriya__montаjа = row.ItemArray[2].ToString(),
+                            stoimost = Convert.ToDouble(row.ItemArray[3]),
+                            kol_vo = Convert.ToDouble(row.ItemArray[4]),
+                            summa = Convert.ToDouble(row.ItemArray[3]) * Convert.ToDouble(row.ItemArray[4])
+                        });
             }
         }
     }

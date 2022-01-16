@@ -23,14 +23,14 @@
                   GridLinesVisibility="All"
                   ColumnWidth="*"
                   Grid.Row="1">
-            <DataGrid.Columns>
+            <!--<DataGrid.Columns>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding nаimenovаnie}" Width="*"/>
                 <DataGridTextColumn Header="Производитель" Binding="{Binding proizvoditel}"/>
                 <DataGridTextColumn Header="Категория монтажа" Binding="{Binding kаtegoriya__montаjа}"/>
                 <DataGridTextColumn Header="Стоимость" Binding="{Binding stoimost}"/>
                 <DataGridTextColumn Header="Количество" Binding="{Binding kol_vo}"/>
                 <DataGridTextColumn Header="Сумма" Binding="{Binding summa}"/>
-            </DataGrid.Columns>
+            </DataGrid.Columns>-->
         </DataGrid>
         <Button Grid.Row="0" x:Name="Button1" Content="Открыть Excel " HorizontalAlignment="Left" Width="150" Height="30" Margin="10, 0, 0, 0" Click="openExcelBtn_Click"/>
         <Button Grid.Row="0" x:Name="Button2" Content="Открыть XML" HorizontalAlignment="Left" Width="150" Height="30" Margin="170, 0, 0, 0" Click="opentXmlBtn_Click"/>
