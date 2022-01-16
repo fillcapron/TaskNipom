@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Data;
 using System.Data.OleDb;
 using System.Xml;
+using System.Xml.Serialization;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace TaskNipom
@@ -26,6 +27,8 @@ namespace TaskNipom
         {
             InitializeComponent();
         }
+
+        [Serializable]
         public class Electrocomponents
         {
             public string nаimenovаnie { get; set; }
@@ -150,11 +153,12 @@ namespace TaskNipom
             {
                 try
                 {
-                    Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-                    XmlReader xmlFile = XmlReader.Create(openFileDialog.FileName, new XmlReaderSettings());
-                    ds.ReadXml(xmlFile);
-                    DataTable dataTable = ds.Tables[0];
-                    this.DataTable_to_Class(dataTable);
+                    XmlSerializer xml = new XmlSerializer(typeof(List<Electrocomponents>));
+
+                    using (FileStream fs = new FileStream(openFileDialog.FileName, FileMode.OpenOrCreate))
+                    {
+                        electrocomponents = (List<Electrocomponents>)xml.Deserialize(fs);
+                    }
                 }
                 catch(XmlException ex)
                 {
@@ -173,13 +177,12 @@ namespace TaskNipom
             {
                 try
                 {
-                    Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-                    XmlWriterSettings settings = new XmlWriterSettings();
-                    settings.Encoding = Encoding.GetEncoding("windows-1251");
-                    settings.Indent = true;
-                    settings.IndentChars = ("\t");
-                    XmlWriter writerFile = XmlWriter.Create(saveFileDialog.FileName, settings);
-                    ds.Tables[0].WriteXml(writerFile);
+                    XmlSerializer xml = new XmlSerializer(typeof(List<Electrocomponents>));
+
+                    using(FileStream fs = new FileStream(saveFileDialog.FileName, FileMode.OpenOrCreate))
+                    {
+                        xml.Serialize(fs, electrocomponents);
+                    }
                 }
                 catch (Exception ex)
                 {
